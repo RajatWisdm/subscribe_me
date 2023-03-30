@@ -38,8 +38,7 @@
 		wp_mail($to, $subject, $message, $headers);
 	}
 
-	function get_daily_post_summary()
-	{
+	function get_daily_post_summary()	{
 		$args = array(
 			'post_type' => 'post',
 			'posts_per_page' => get_option('no_of_posts'),
