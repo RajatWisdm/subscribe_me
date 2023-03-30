@@ -219,7 +219,7 @@ class Subscribe_Me {
 	function wdm_sub_shortcode() { 
   
 		// Things that you want to do.
-		$form = '<form method="post">
+		$form = '<form method = "post">
 		<div class="mb-3">
 		  <label for="exampleInputEmail1" class="form-label">Email address</label>
 		  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
