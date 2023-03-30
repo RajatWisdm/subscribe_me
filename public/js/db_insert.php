@@ -1,41 +1,64 @@
 <?php
-    global $wpdb;
+    // global $wpdb;
+    
+    // $table_name = 'wdm_sub_me';
+    // if (isset($_POST['sub_email'])) {
+    //   $wpdb->insert(
+    //     $table_name,
+    //     array(
+    //       'subscriber' => $_POST['sub_email']
+    //     )
+    //   );
+    // }
+    $email = $_POST['sub_email'];
+    
+    $conn = mysqli_connect( "http://plugin-assg.local/", "root", "root", "local" );
 
-    $table_name = 'wdm_scheduled_data';
-    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "INSERT INTO wdm_sub_me('subscriber') VALUES($email)";
 
-    if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name){
-      $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        id mediumint(9) AUTO_INCREMENT,
-        date date NOT NULL,
-        occasion varchar(255) NOT NULL,
-        post_title varchar(255) NOT NULL,
-        author int(11) NOT NULL,
-        reviewer varchar(255) NOT NULL,
-        PRIMARY KEY  (id)
-      ) $charset_collate;";
-  
-      require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-      dbDelta( $sql );
-    }
+    mysqli_query($conn, $sql);
 
+    function send_subscription_mail($to)
+	{
+		$subject = 'Latest Post Summary';
+		$summary = get_daily_post_summary();
+		$message = "Latest Posts: ";
+		$message .= "\n";
+		foreach ($summary as $post_data) {
+			$message .= 'Title: ' . $post_data['title'] . "\n";
+			$message .= 'URL: ' . $post_data['url'] . "\n";
+			$message .= "\n";
+		}
 
-    if (isset($_POST['date']) && isset($_POST['occasion']) && isset($_POST['post_title']) && isset($_POST['author']) && isset($_POST['reviewer'])) {
-      $table_name = 'wdm_scheduled_data';
-      $date = sanitize_text_field($_POST['date']);
-      $occasion = sanitize_text_field($_POST['occasion']);
-      $post_title = sanitize_text_field($_POST['post_title']);
-      $author = sanitize_text_field($_POST['author']);
-      $reviewer = sanitize_text_field($_POST['reviewer']);
-      $wpdb->insert(
-        $table_name,
-        array(
-          'date' => $date,
-          'occasion' => $occasion,
-          'post_title' => $post_title,
-          'author' => $author,
-          'reviewer' => $reviewer
-        )
-      );
-    }
+		$headers = array(
+			'From: wisdm@shilavilla.com',
+			'Content-Type: text/html; charset=UTF-8'
+		);
+
+		wp_mail($to, $subject, $message, $headers);
+	}
+
+	function get_daily_post_summary()
+	{
+		$args = array(
+			'post_type' => 'post',
+			'posts_per_page' => get_option('no_of_posts'),
+			'post_status' => 'publish'
+		);
+
+		$query = new WP_Query($args);
+		$posts = $query->posts;
+		$mail_list = array();
+
+		foreach ($posts as $post) {
+			$post_data = array(
+				'title' => $post->post_title,
+				'url' => get_permalink($post->ID),
+			);
+			array_push($mail_list, $post_data);
+		}
+		return $mail_list;
+	}
+
+    
 ?>
