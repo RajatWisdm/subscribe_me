@@ -72,6 +72,27 @@ class Subscribe_Me {
 		} else {
 			$this->version = '1.0.0';
 		}
+
+		global $wpdb;
+
+    $table_name = 'wdm_sub_me';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name){
+      $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        id mediumint(9) AUTO_INCREMENT,
+        date date NOT NULL,
+        occasion varchar(255) NOT NULL,
+        post_title varchar(255) NOT NULL,
+        author int(11) NOT NULL,
+        reviewer varchar(255) NOT NULL,
+        PRIMARY KEY  (id)
+      ) $charset_collate;";
+  
+      require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+      dbDelta( $sql );
+    }
+
 		$this->plugin_name = 'subscribe-me';
 
 		$this->load_dependencies();
@@ -219,20 +240,27 @@ class Subscribe_Me {
 	function wdm_sub_shortcode() { 
   
 		// Things that you want to do.
-		$form = '<form method = "post">
+		$form = '
 		<div class="mb-3">
 		  <label for="exampleInputEmail1" class="form-label">Email address</label>
-		  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+		  <input type="email" id="wdm-sub-me" name="wdm_sub_me" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
 		  <div id="emailHelp" class="form-text">We will never share your email with anyone else.</div>
+		  <button class="btn btn-primary" id="wdm-sub-btn">Submit</button>
 		</div>
-		<button type="submit" class="btn btn-primary">Submit</button>
-	  </form>'; 
+		<div id="asd">hi</div>
+	  
+	  
+	  '; 
 		  
 		// Output needs to be return
 		return $form;
 		}
 		// register shortcode
+	// function wdm_ajax_js() {
+	// 	wp_enqueue_script( 'ajax_script', plugin_dir_path( __DIR__ ).'/app/public/wp-content/plugins/subscribe-me/public/js/handle_form_ajax.js', false );
+	// }
 	function wdm_add_shortcode() {
+
 		add_shortcode('wdm_sub_me', array($this, 'wdm_sub_shortcode'));
 	}
 

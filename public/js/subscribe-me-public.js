@@ -28,5 +28,22 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
+	$(document).ready(function() {
+		$("#wdm-sub-btn").on("click", function(e) {
+			let email = $("#wdm-sub-me").val();
+			console.log(email);
+			$.ajax({
+				url : "http://plugin-assg.local/wp-content/plugins/subscribe-me/public/js/db_insert.php",
+				type : "POST",
+				data: {sub_email: email},
+				success: function(data){
+					$("#asd").html(data)
+					// console.log(data);
+				}
+
+			})
+		})
+	})
 
 })( jQuery );
+
